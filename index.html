@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohammed Jazar — Photography & Videography</title>
+<meta name="description" content="Photography and videography portfolio of Mohammed Jazar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- GSAP Animation Standard Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<style>
+  :root{
+    --bg: #0b0f1a;
+    --surface: #131a29;
+    --surface-2: #1a2233;
+    --line: #232c40;
+    --text: #edf1f5;
+    --text-muted: #8b95a7;
+    --cyan: #4dd9e8;
+    --sunset: #ff7a4d;
+    --max: 1200px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  /* Strict Repaint Containment */
+  html, body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x: hidden !important; 
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  /* Kills complex hover math during scrolling to save CPU */
+  body.is-scrolling * {
+    pointer-events: none !important;
+  }
+
+  .site-wrapper {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+
+  h1, h2, h3, .logo, .hero-eyebrow, .navlinks a, .btn, .tile-caption, .contact-link, .stat .label {
+    font-family:'Space Grotesk', sans-serif;
+    text-transform: uppercase !important;
+    letter-spacing: 0.15em !important;
+  }
+
+  a{color:inherit;}
+  img{display:block; max-width:100%;}
+
+  :focus-visible{
+    outline:2px solid var(--cyan);
+    outline-offset:3px;
+  }
+
+  .wrap{
+    max-width:var(--max);
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ---------- Nav ---------- */
+  header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    background:rgba(11,15,26,0);
+    border-bottom:1px solid rgba(255,255,255,0);
+    transition: background 0.2s ease, border-color 0.2s ease, padding 0.2s ease;
+  }
+  header.nav-scrolled {
+    background:rgba(11,15,26,0.95);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  nav{
+    max-width:var(--max);
+    margin:0 auto;
+    padding:24px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    transition: padding 0.2s ease;
+  }
+  header.nav-scrolled nav {
+    padding: 12px 24px;
+  }
+  
+  .logo{
+    font-weight:600;
+    font-size:0.95rem;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    white-space:nowrap;
+  }
+  .logo .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 10px var(--cyan);
+  }
+  .navlinks{
+    display:flex;
+    gap:20px;
+    list-style:none;
+  }
+  .navlinks a{
+    text-decoration:none;
+    color:var(--text-muted);
+    font-size:0.78rem;
+    position:relative;
+    transition:color 0.15s ease;
+  }
+  .navlinks a:hover, header.nav-scrolled .navlinks a:hover {color:var(--text);}
+  
+  .navlinks a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -4px;
+    left: 0;
+    background-color: var(--text);
+    transition: width 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .navlinks a:hover::after {
+    width: 100%;
+  }
+
+  @media (max-width: 540px) {
+    nav { padding: 16px 16px; }
+    header.nav-scrolled nav { padding: 10px 16px; }
+    .logo { font-size: 0.85rem; letter-spacing: 0.1em !important; }
+    .navlinks { gap: 14px; }
+    .navlinks a { font-size: 0.72rem; letter-spacing: 0.1em !important; }
+  }
+
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: var(--cyan);
+    width: 0%;
+    z-index: 100;
+    box-shadow: 0 0 10px var(--cyan);
+    will-change: width;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-end;
+    overflow:hidden;
+    width: 100%;
+  }
+  .hero-media{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    will-change: transform; 
+  }
+  .hero-media img{
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:center center;
+    opacity:0;
+    transform:scale(1.06);
+    animation:heroIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes heroIn{
+    to{opacity:1; transform:scale(1);}
+  }
+  .hero-media::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(11,15,26,0.15) 0%, rgba(11,15,26,0.45) 55%, rgba(11,15,26,0.98) 100%),
+      linear-gradient(90deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0) 40%);
+  }
+  .hero-content{
+    position:relative;
+    z-index:1;
+    width:100%;
+    padding:0 32px 72px;
+    max-width:var(--max);
+    margin:0 auto;
+    opacity:0;
+    transform:translateY(16px);
+    animation:contentIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+  @keyframes contentIn{
+    to{opacity:1; transform:translateY(0);}
+  }
+  
+  .hero-eyebrow{
+    color:#e0c38c !important;
+    font-size:0.80rem;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .hero-eyebrow::before{
+    content:"";
+    width:24px; height:1px;
+    background:#e0c38c !important;
+  }
+  
+  .hero h1{
+    font-size:clamp(2.6rem, 7vw, 5.2rem);
+    font-weight:700;
+    line-height:1.02;
+    max-width:14ch;
+  }
+  .hero p{
+    margin-top:22px;
+    max-width:48ch;
+    color:var(--text-muted);
+    font-size:1.05rem;
+  }
+  .hero-cta{
+    margin-top:34px;
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+
+  .magnetic {
+    display:inline-flex;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .btn{
+    align-items:center;
+    gap:8px;
+    padding:13px 24px;
+    border-radius:2px;
+    text-decoration:none;
+    font-size:0.85rem;
+    font-weight:600;
+  }
+  .btn-primary{
+    background:var(--cyan);
+    color:#06131a;
+  }
+  .btn-primary:hover{
+    box-shadow: 0 8px 20px rgba(77, 217, 232, 0.35);
+    transform: translateY(-2px);
+  }
+  .btn-ghost{
+    border:1px solid rgba(255,255,255,0.18);
+    color:var(--text);
+  }
+  .btn-ghost:hover{
+    border-color:var(--cyan); 
+    color:var(--cyan);
+    transform: translateY(-2px);
+  }
+
+  section{
+    padding:110px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    margin-bottom:56px;
+    flex-wrap:wrap;
+  }
+  .section-head h2{
+    font-size:clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight:600;
+  }
+  .section-head .count{
+    color:var(--text-muted);
+    font-size:0.92rem;
+  }
+
+  .gsap-reveal {
+    opacity: 0; 
+  }
+
+  /* ---------- Fluid Masonry Gallery ---------- */
+  .gallery {
+    column-count: 3; /* 3 Columns on desktop */
+    column-gap: 16px;
+  }
+  
+  .tile {
+    break-inside: avoid; /* Prevents an image from being split across columns */
+    margin-bottom: 16px; /* Vertical gap */
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+    cursor: pointer;
+    background: transparent; /* No more boxes */
+    
+    contain: layout paint; 
+    transform: translateZ(0); 
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+  }
+
+  .tile:hover {
+    z-index: 2;
+  }
+  
+  .tile img, .tile video {
+    width: 100%;
+    height: auto !important; /* Forces the EXACT original aspect ratio! */
+    display: block;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .tile:hover img, .tile:hover video {
+    transform: scale(1.04); 
+  }
+  
+  .tile-caption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:16px;
+    background:linear-gradient(0deg, rgba(6,9,15,0.82), transparent);
+    font-size:0.80rem;
+    color:var(--text);
+    opacity:0;
+    transition:opacity 0.2s;
+  }
+  .tile:hover .tile-caption{opacity:1;}
+
+  /* Responsive Masonry Layout */
+  @media (max-width:900px){
+    .gallery { column-count: 2; }
+  }
+  @media (max-width:600px){
+    .gallery { column-count: 2; } /* 2 columns on mobile looks premium */
+  }
+
+  /* ---------- Lightbox Modal ---------- */
+  .lightbox {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(6, 9, 15, 0.98);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .lightbox.active {
+    display: flex;
+    opacity: 1;
+  }
+  .lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+  }
+  .lightbox.active .lightbox-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+  .lightbox-content img, .lightbox-content video {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: var(--text-muted);
+    font-size: 40px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: color 0.15s;
+    z-index: 10000;
+  }
+  .lightbox-close:hover {
+    color: var(--cyan);
+  }
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(11,15,26,0.6);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .lightbox-nav:hover {
+    background: var(--cyan);
+    color: #000;
+    border-color: var(--cyan);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .lightbox-nav:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+  .lightbox-prev { left: 30px; }
+  .lightbox-next { right: 30px; }
+
+  @media (max-width: 600px) {
+    .lightbox-prev { left: 10px; }
+    .lightbox-next { right: 10px; }
+    .lightbox-content { max-width: 95vw; }
+  }
+
+  /* ---------- About ---------- */
+  .about-grid{
+    display:grid;
+    grid-template-columns:0.9fr 1.1fr;
+    gap:72px;
+    align-items:center;
+  }
+  .about-media{
+    position:relative;
+    aspect-ratio:4/5;
+    overflow:hidden;
+    border-radius:2px;
+    background:var(--surface);
+  }
+  .about-media img{width:100%; height:100%; object-fit:cover;}
+  
+  .about-text h2{
+    font-size:clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight:600;
+    margin-bottom:26px;
+  }
+  .about-text p{
+    color:var(--text-muted);
+    margin-bottom:18px;
+    max-width:56ch;
+  }
+  .stat-row{
+    display:flex;
+    gap:40px;
+    margin-top:38px;
+    flex-wrap:wrap;
+  }
+  .stat .num{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:2rem;
+    font-weight:700;
+    color:var(--cyan);
+  }
+  .stat .label{
+    color:var(--text-muted);
+    font-size:0.75rem;
+    margin-top:4px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width:820px){
+    .about-grid{grid-template-columns:1fr; gap:40px;}
+  }
+
+  /* ---------- Contact ---------- */
+  .contact{
+    border-bottom:none;
+    text-align:left;
+  }
+  .contact-inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:40px;
+    flex-wrap:wrap;
+  }
+  .contact h2{
+    font-size:clamp(2rem, 5vw, 3.4rem);
+    font-weight:600;
+    max-width:16ch;
+    line-height:1.08;
+  }
+  .contact-links{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    align-items: flex-start;
+  }
+  .contact-link{
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    font-size:0.90rem;
+    padding-bottom:4px;
+    border-bottom:1px solid rgba(255,255,255,0.14);
+    transition: color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .contact-link:hover{
+    border-color:var(--cyan); 
+    color:var(--cyan);
+    transform: translateX(6px);
+  }
+
+  footer{
+    padding:32px;
+    text-align:center;
+    color:var(--text-muted);
+    font-size:0.82rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<header id="navbar">
+  <nav>
+    <a href="#top" class="logo interactive-btn"><span class="dot"></span>Mohammed Jazar</a>
+    <ul class="navlinks">
+      <li><a href="#work" class="interactive-btn">Work</a></li>
+      <li><a href="#about" class="interactive-btn">About</a></li>
+      <li><a href="#contact" class="interactive-btn">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="site-wrapper">
+  <main id="top">
+
+    <section class="hero" style="border-bottom:none; padding:0;">
+      <div class="hero-media" id="hero-media">
+        <img id="hero-img" src="" alt="Photo by Mohammed Jazar">
+      </div>
+      <div class="hero-content">
+        <div class="hero-eyebrow">Photography &amp; Videography — based in Dubai</div>
+        <h1>Mohammed Jazar</h1>
+        <p>I am a Dubai-based visual creator specialising in cinematic colour grading and technical precision. Delivering polished, high-resolution visual assets for modern brand campaigns.</p>
+        <div class="hero-cta">
+          <a href="#work" class="btn btn-primary interactive-btn magnetic">View the work</a>
+          <a href="#contact" class="btn btn-ghost interactive-btn magnetic">Get in touch</a>
+        </div>
+      </div>
+      <div class="horizon"></div>
+    </section>
+
+    <section id="work">
+      <div class="wrap">
+        <div class="section-head gsap-reveal">
+          <h2>Selected work</h2>
+          <div class="count" id="photo-count">Loading media…</div>
+        </div>
+
+        <div class="gallery" id="gallery">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="wrap">
+        <div class="about-grid">
+          <div class="about-media gsap-reveal">
+            <img src="assets/portrait.jpg" alt="Mohammed Jazar" loading="lazy" decoding="async">
+          </div>
+          <div class="about-text">
+            <h2 class="gsap-reveal">About</h2>
+            <p class="gsap-reveal">
+              I am Mohammed Jazar, a Dubai-based visual creator specialising in cinematic colour grading and technical precision. I craft high-end architectural, commercial, and lifestyle imagery, merging advanced digital emulation techniques with a distinct, atmospheric aesthetic to deliver standout visual assets.
+            </p>
+            <div class="stat-row gsap-reveal">
+              <div class="stat">
+                <div class="num">UAE</div>
+                <div class="label">Based in Dubai</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="wrap">
+        <div class="contact-inner">
+          <h2 class="gsap-reveal">Let's work together on your next shoot.</h2>
+          <div class="contact-links gsap-reveal">
+            <a class="contact-link interactive-btn magnetic" href="https://www.instagram.com/mohd_jazar" target="_blank" rel="noopener">Instagram — @mohd_jazar</a>
+            <a class="contact-link interactive-btn magnetic" href="https://www.linkedin.com/in/mohammedjazar" target="_blank" rel="noopener">LinkedIn — Mohammed Jazar</a>
+            <a class="contact-link interactive-btn magnetic" href="mailto:mohammedjazarks@gmail.com">Email — mohammedjazarks@gmail.com</a>
+            <a class="contact-link interactive-btn magnetic" href="tel:+971588020181">Call — +971 58 802 0181</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="gsap-reveal">
+    © <span id="year"></span> Mohammed Jazar. All visuals on this site are original work.
+  </footer>
+</div>
+
+<!-- LIGHTBOX MODAL -->
+<div id="lightbox" class="lightbox">
+  <span class="lightbox-close">&times;</span>
+  <button class="lightbox-nav lightbox-prev" aria-label="Previous">&#10094;</button>
+  <div class="lightbox-content" id="lightbox-content"></div>
+  <button class="lightbox-nav lightbox-next" aria-label="Next">&#10095;</button>
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Initialize GSAP
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Audio Synthesizer
+  function playHapticTick() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.05);
+      
+      gainNode.gain.setValueAtTime(0.05, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.05);
+    } catch(e) {
+      console.log("Audio tick skipped.");
+    }
+  }
+
+  document.querySelectorAll('.interactive-btn').forEach(btn => {
+    btn.addEventListener('click', playHapticTick);
+  });
+
+  // Magnetic Buttons (Desktop Only)
+  if(window.innerWidth > 768) {
+    document.querySelectorAll('.magnetic').forEach(elem => {
+      elem.addEventListener('mousemove', (e) => {
+        const rect = elem.getBoundingClientRect();
+        const x = (e.clientX - rect.left - (rect.width / 2)) * 0.25; 
+        const y = (e.clientY - rect.top - (rect.height / 2)) * 0.25;
+        elem.style.transform = `translate(${x}px, ${y}px) scale(1.03)`;
+      });
+      elem.addEventListener('mouseleave', () => {
+        elem.style.transform = 'translate(0px, 0px) scale(1)';
+      });
+    });
+  }
+
+  // Scrolling Performance Lock (Ultra Fast Reset)
+  const header = document.getElementById('navbar');
+  const heroMedia = document.getElementById('hero-media');
+  const progressBar = document.getElementById('scroll-progress');
+  let scrollTimeout;
+
+  window.addEventListener('scroll', () => {
+    let scrollY = window.scrollY;
+    
+    document.body.classList.add('is-scrolling');
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        document.body.classList.remove('is-scrolling');
+    }, 50); 
+    
+    if (scrollY > 50) {
+      header.classList.add('nav-scrolled');
+    } else {
+      header.classList.remove('nav-scrolled');
+    }
+    
+    if (heroMedia && scrollY < window.innerHeight) {
+      heroMedia.style.transform = `translateY(${scrollY * 0.35}px)`;
+    }
+
+    let documentHeight = document.body.scrollHeight - window.innerHeight;
+    let scrollPercentage = (scrollY / documentHeight) * 100;
+    progressBar.style.width = scrollPercentage + '%';
+  });
+
+  // GSAP Text Fades
+  gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+    gsap.fromTo(elem, 
+      { opacity: 0, y: 20 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.6, 
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: elem,
+          start: "top 90%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
+  });
+
+  const GH_OWNER = 'mohammedjazarks';
+  const GH_REPO = 'mohammedjazarks.github.io';
+  const GH_BRANCH = 'main';
+  const PHOTOS_PATH = 'assets/photos';
+
+  let lightboxMediaArray = [];
+  let currentLightboxIndex = 0;
+  const lightbox = document.getElementById('lightbox');
+  const lbContent = document.getElementById('lightbox-content');
+
+  async function loadGallery(){
+    const galleryEl = document.getElementById('gallery');
+    const countEl = document.getElementById('photo-count');
+    const heroImg = document.getElementById('hero-img');
+
+    try{
+      const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${PHOTOS_PATH}?ref=${GH_BRANCH}`);
+      if(!res.ok) throw new Error('GitHub API request failed');
+      const files = await res.json();
+
+      let mediaFiles = files.filter(f => f.type === 'file' && /\.(jpe?g|png|webp|mp4|webm|mov)$/i.test(f.name) && f.name !== 'portrait.jpg');
+
+      if(mediaFiles.length === 0) throw new Error('No media found');
+
+      const rawBase = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}/${PHOTOS_PATH}/`;
+
+      const allPhotos = mediaFiles.filter(f => !/\.(mp4|webm|mov)$/i.test(f.name));
+      const isMobile = window.innerWidth <= 768;
+      
+      let heroPhotos = allPhotos.filter(f => {
+        const lowerName = f.name.toLowerCase();
+        return isMobile ? lowerName.startsWith('mobile-') : lowerName.startsWith('desktop-');
+      });
+      
+      if (heroPhotos.length === 0) heroPhotos = allPhotos;
+      
+      if (heroPhotos.length > 0) {
+        heroPhotos.sort(() => Math.random() - 0.5);
+        let heroIndex = 0;
+        heroImg.src = rawBase + encodeURIComponent(heroPhotos[heroIndex].name);
+
+        setInterval(() => {
+          heroImg.style.transition = 'opacity 0.6s ease-in-out';
+          heroImg.style.opacity = '0';
+          setTimeout(() => {
+            heroIndex = (heroIndex + 1) % heroPhotos.length;
+            heroImg.src = rawBase + encodeURIComponent(heroPhotos[heroIndex].name);
+            heroImg.style.opacity = '1';
+          }, 600);
+        }, 5000);
+      }
+
+      mediaFiles.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric:true}));
+      galleryEl.innerHTML = '';
+      
+      lightboxMediaArray = mediaFiles.map(file => {
+        return {
+          url: rawBase + encodeURIComponent(file.name),
+          isVideo: /\.(mp4|webm|mov)$/i.test(file.name)
+        };
+      });
+
+      // Render Masonry Grid
+      mediaFiles.forEach((file, i) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile'; // Masonry handles sizing automatically now!
+
+        const fileUrl = rawBase + encodeURIComponent(file.name);
+        const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
+
+        if (isVideo) {
+          tile.innerHTML = `<video src="${fileUrl}" autoplay loop muted playsinline style="width:100%; height:auto; object-fit:contain; pointer-events:none;"></video>`;
+        } else {
+          tile.innerHTML = `<img src="${fileUrl}" alt="Visual by Mohammed Jazar" loading="lazy" decoding="async">`;
+        }
+        
+        tile.addEventListener('click', () => openLightbox(i));
+        galleryEl.appendChild(tile);
+      });
+
+      countEl.textContent = mediaFiles.length + (mediaFiles.length === 1 ? ' item' : ' items');
+      
+      // --- HYPER-SNAP VELOCITY ENGINE (CONTINUOUS) ---
+      setTimeout(() => {
+          let mm = gsap.matchMedia();
+          const tiles = gsap.utils.toArray('.tile');
+
+          mm.add("(min-width: 601px)", () => {
+              tiles.forEach(tile => {
+                  gsap.from(tile, {
+                      duration: 0.6, 
+                      opacity: 0,
+                      scale: 0.2, 
+                      x: () => gsap.utils.random(-window.innerWidth * 0.5, window.innerWidth * 0.5), 
+                      y: () => gsap.utils.random(-window.innerHeight * 0.5, window.innerHeight * 0.5), 
+                      rotation: () => gsap.utils.random(-45, 45),
+                      force3D: true,
+                      ease: "back.out(1.5)", 
+                      scrollTrigger: {
+                          trigger: tile, 
+                          start: "top 95%", 
+                          toggleActions: "play none none reverse" 
+                      }
+                  });
+              });
+          });
+
+          mm.add("(max-width: 600px)", () => {
+              tiles.forEach(tile => {
+                  gsap.from(tile, {
+                      duration: 0.5, 
+                      opacity: 0,
+                      scale: 0.3, 
+                      x: () => gsap.utils.random(-window.innerWidth * 0.4, window.innerWidth * 0.4), 
+                      y: () => gsap.utils.random(-window.innerHeight * 0.4, window.innerHeight * 0.4), 
+                      rotation: () => gsap.utils.random(-25, 25),
+                      force3D: true,
+                      ease: "back.out(1.5)", 
+                      scrollTrigger: {
+                          trigger: tile, 
+                          start: "top 95%", 
+                          toggleActions: "play none none reverse" 
+                      }
+                  });
+              });
+          });
+          
+          ScrollTrigger.refresh();
+      }, 100);
+
+    }catch(err){
+      console.error('Gallery auto-load failed:', err);
+    }
+  }
+
+  function openLightbox(index) {
+    playHapticTick();
+    currentLightboxIndex = index;
+    updateLightboxContent();
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden'; 
+  }
+
+  function closeLightbox() {
+    playHapticTick();
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+    setTimeout(() => { lbContent.innerHTML = ''; }, 200); 
+  }
+
+  function updateLightboxContent() {
+    const media = lightboxMediaArray[currentLightboxIndex];
+    lbContent.style.opacity = '0';
+    setTimeout(() => {
+      if(media.isVideo) {
+        lbContent.innerHTML = `<video src="${media.url}" autoplay loop controls playsinline></video>`;
+      } else {
+        lbContent.innerHTML = `<img src="${media.url}" alt="Full Resolution Visual">`;
+      }
+      lbContent.style.opacity = '1';
+    }, 100);
+  }
+
+  function nextMedia() {
+    playHapticTick();
+    currentLightboxIndex = (currentLightboxIndex + 1) % lightboxMediaArray.length;
+    updateLightboxContent();
+  }
+
+  function prevMedia() {
+    playHapticTick();
+    currentLightboxIndex = (currentLightboxIndex - 1 + lightboxMediaArray.length) % lightboxMediaArray.length;
+    updateLightboxContent();
+  }
+
+  document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+  document.querySelector('.lightbox-next').addEventListener('click', nextMedia);
+  document.querySelector('.lightbox-prev').addEventListener('click', prevMedia);
+
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox || e.target.classList.contains('lightbox-content')) {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextMedia();
+    if (e.key === 'ArrowLeft') prevMedia();
+  });
+
+  loadGallery();
+</script>
+
+</body>
+</html>
